@@ -727,10 +727,8 @@ A: "Five key metrics:
 
 ## 📊 Results & Impact
 
-- **Processing Speed:** 4,407 events processed in <30 seconds (end-to-end)
+- **Processing Speed:** 4,407 events processed (end-to-end)
 - **Latency:** Sub-5-second data availability for live dashboards
-- **Data Quality:** 99.8% of events pass validation (0.2% quarantined for review)
-- **Cost:** ~$3 per million events (Databricks serverless)
 - **Visualizations:** 3 publication-quality pitch analysis charts (heatmap, pass network, shot map)
 
 ---
@@ -743,7 +741,7 @@ This project uses StatsBomb's open data (CC BY-SA 4.0). See [StatsBomb Open Data
 
 ## 👤 Author
 
-**Pawan Virat**
+**Pawan Kumar Rai**
 - Built on Databricks (AWS)
 - Tech Stack: PySpark, Delta Lake, Unity Catalog, mplsoccer
 - Data Source: StatsBomb Open Data (2022 FIFA World Cup Final)
