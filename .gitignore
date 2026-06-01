@@ -1,0 +1,195 @@
+# MatchPulse .gitignore
+
+# =============================================================================
+# CRITICAL: Never commit credentials or secrets!
+# =============================================================================
+
+# AWS Credentials
+*.pem
+*.key
+.aws/
+credentials
+config
+
+# Databricks Tokens
+.databrickscfg
+.databricks/
+*.token
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Secret management
+secrets/
+*.secrets
+
+# =============================================================================
+# Data Files (too large for Git)
+# =============================================================================
+
+# Raw data
+raw/
+*.parquet
+*.csv
+*.json.gz
+*.avro
+
+# Bronze/Silver/Gold layers
+bronze/
+silver/
+gold/
+
+# StatsBomb data (download via script instead)
+statsbomb_data/
+
+# Checkpoints and state
+_checkpoints/
+_spark_metadata/
+_delta_log/
+
+# =============================================================================
+# Databricks Specific
+# =============================================================================
+
+# Databricks CLI
+.databricks-connect
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# DLT/Pipeline metadata
+.dlt/
+
+# Unity Catalog cache
+.uc/
+
+# =============================================================================
+# Python
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+PIPFILE.lock
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# =============================================================================
+# Machine Learning
+# =============================================================================
+
+# MLflow
+mlruns/
+mlartifacts/
+*.mlflow
+
+# Model artifacts
+models/*.pkl
+models/*.h5
+models/*.pt
+models/*.onnx
+
+# Training outputs
+outputs/
+logs/
+tensorboard/
+
+# =============================================================================
+# OS & IDE
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE_BIN/
+
+# Linux
+*~
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.bak
+*.cache
+
+# =============================================================================
+# Project Specific
+# =============================================================================
+
+# Local development
+local_tests/
+scratch/
+playground/
+
+# Large visualizations
+*.png
+*.jpg
+*.svg
+!docs/*.png
+!docs/*.jpg
+
+# Generated documentation
+docs/_build/
+site/
