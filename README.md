@@ -60,13 +60,13 @@ Modern football analytics requires **real-time processing** of match events to p
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────────────┐
 │                         DATA SOURCES                                 │
 │  StatsBomb Open Data (Match Events) → S3 Bucket                     │
-└────────────────────────┬────────────────────────────────────────────┘
+└────────────────────────┬───────────────────────────────────────────┘
                          │
                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────────────┐
 │                    INGESTION LAYER                                   │
 │  ┌──────────────────────────────────────────────────────┐           │
 │  │  Auto Loader (Databricks)                            │           │
@@ -74,10 +74,10 @@ Modern football analytics requires **real-time processing** of match events to p
 │  │  • Checkpoint management (exactly-once semantics)    │           │
 │  │  • Incremental file discovery                        │           │
 │  └──────────────────────────────────────────────────────┘           │
-└────────────────────────┬────────────────────────────────────────────┘
+└────────────────────────┬───────────────────────────────────────────┘
                          │
                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────────────┐
 │               MEDALLION ARCHITECTURE (Delta Lake)                    │
 │                                                                      │
 │  ┌───────────────────┐    ┌───────────────────┐    ┌──────────────┐│
@@ -88,15 +88,15 @@ Modern football analytics requires **real-time processing** of match events to p
 │  │ • Full history    │    │   joins           │    │ • Win prob   ││
 │  │ • Schema on read  │    │ • Data quality    │    │ • Shot maps  ││
 │  └───────────────────┘    └───────────────────┘    └──────────────┘│
-└─────────────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────��──────────────────────────┘
                          │
                          ▼
-┌─────────────────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────────────┐
 │                    ANALYTICS & SERVING                               │
 │  • Unity Catalog Tables (matchpulse.default.*)                      │
 │  • Lakeview Dashboards (real-time metrics)                          │
 │  • mplsoccer Visualizations (pitch analysis)                        │
-└─────────────────────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Architectural Decisions
@@ -274,31 +274,61 @@ def gold_live_match_state():
 ```
 MatchPulse/
 │
-├── 01_setup/
+├── 00_setup/
 │   ├── 01_fetch_statsbomb.py          # Download StatsBomb open data
 │   ├── 02_setup_s3_credentials.py     # Configure AWS access
 │   └── 03_create_catalog_schema.py    # Initialize Unity Catalog
 │
-├── 02_batch_processing/
-│   ├── 01_bronze_batch.py             # Load historical events to bronze
-│   ├── 02_silver_batch.py             # Build reference tables (player stats)
-│   └── 03_gold_batch.py               # Pre-compute aggregates
+├── 01_ingestion/
+│   ├── 01_ingest_matches_bronze.ipynb        # Load match metadata
+│   ├── 02_ingest_events_bronze.ipynb         # Load event-level data
+│   ├── 03_ingest_lineups_bronze.ipynb        # Load player lineups
+│   └── README.md                             # Bronze layer documentation
 │
-├── 03_streaming_simulator/
-│   └── streaming_event_generator.py   # Simulate live event stream
+├── 02_batch_historical/
+│   ├── 01_build_player_career_stats.ipynb    # Aggregate player statistics
+│   ├── 02_build_team_form.ipynb              # Calculate rolling team form
+│   ├── 03_build_h2h_records.ipynb            # Build head-to-head records
+│   ├── 04_build_player_vs_team.ipynb         # Player vs opponent analysis
+│   └── README.md                             # Silver layer documentation
+│
+├── 03_ml/
+│   ├── 01_feature_engineering.ipynb          # ML feature store prep
+│   ├── 02_train_win_probability.ipynb        # XGBoost win predictor
+│   └── 03_player_similarity.ipynb            # Player embedding model
 │
 ├── 04_streaming/
-│   └── 02_streaming_pipeline_dlt.py   # Main Lakeflow pipeline (PRODUCTION)
-│
-├── 05_ml/
-│   └── win_probability_model.py       # XGBoost win predictor (WIP)
+│   ├── 00_streaming_simulator.py             # Generate simulated live events
+│   ├── 01_streaming_pipeline_dlt.py          # Main Lakeflow DLT pipeline
+│   └── 02_gold_aggregations.ipynb            # Real-time aggregations
 │
 ├── 06_analysis/
-│   └── wc_final_pitch_analysis.ipynb  # Messi heatmap, pass networks, shot maps
+│   ├── 01_wc_final_pitch_analysis.ipynb      # World Cup Final analysis
+│   ├── 02_advanced_visuals_player_vs_team.ipynb  # Player matchup viz
+│   └── README.md                             # Analysis notebook guide
+│
+├── match-pulse-images/
+│   ├── advanced-visuals-player-vs-team.png   # Player vs team heatmap
+│   ├── arg-passmap.png                       # Argentina pass network
+│   └── [other visualization assets]
 │
 ├── README.md                           # This file
-└── requirements.txt                    # Python dependencies
+├── requirements.txt                    # Python dependencies
+├── index.html                          # Interactive dashboard (HTML)
+└── .gitignore                          # Git ignore rules
 ```
+
+### Folder Descriptions
+
+| Folder | Purpose | Status |
+|--------|---------|--------|
+| **00_setup** | Initial environment configuration and catalog creation | ✅ Ready |
+| **01_ingestion** | Bronze layer - Raw data ingestion from StatsBomb | ✅ Complete |
+| **02_batch_historical** | Silver layer - Feature engineering and reference tables | ✅ Complete |
+| **03_ml** | Machine learning models and training pipelines | 🚧 In Progress |
+| **04_streaming** | Real-time streaming and Gold layer aggregations | ✅ Complete |
+| **06_analysis** | Jupyter notebooks for exploratory analysis and visualizations | ✅ Complete |
+| **match-pulse-images** | Generated visualization outputs and assets | ✅ Complete |
 
 ---
 
@@ -323,7 +353,7 @@ spark.conf.set("fs.s3a.secret.key", dbutils.secrets.get("aws", "secret-key"))
 ### Step 2: Download StatsBomb Data
 
 ```python
-# Run: 01_setup/01_fetch_statsbomb.py
+# Run: 00_setup/01_fetch_statsbomb.py
 from statsbombpy import sb
 
 # Download 2022 World Cup Final (Argentina vs France)
@@ -334,7 +364,7 @@ events.to_parquet("s3a://matchpulse-pawan/bronze/events/wc_final.parquet")
 ### Step 3: Initialize Unity Catalog
 
 ```sql
--- Run: 01_setup/03_create_catalog_schema.py
+-- Run: 00_setup/03_create_catalog_schema.py
 CREATE CATALOG IF NOT EXISTS matchpulse;
 CREATE SCHEMA IF NOT EXISTS matchpulse.default;
 CREATE SCHEMA IF NOT EXISTS matchpulse.silver;
@@ -344,15 +374,25 @@ CREATE SCHEMA IF NOT EXISTS matchpulse.silver;
 
 ```bash
 # Run notebooks in order:
-02_batch_processing/01_bronze_batch.py
-02_batch_processing/02_silver_batch.py   # Creates player_career_stats
-02_batch_processing/03_gold_batch.py
+01_ingestion/01_ingest_matches_bronze.ipynb
+01_ingestion/02_ingest_events_bronze.ipynb
+01_ingestion/03_ingest_lineups_bronze.ipynb
 ```
 
-### Step 5: Start Streaming Pipeline
+### Step 5: Build Silver Layer Features
 
 ```bash
-# Navigate to: 04_streaming/02_streaming_pipeline_dlt.py
+# Run notebooks in order:
+02_batch_historical/01_build_player_career_stats.ipynb
+02_batch_historical/02_build_team_form.ipynb
+02_batch_historical/03_build_h2h_records.ipynb
+02_batch_historical/04_build_player_vs_team.ipynb
+```
+
+### Step 6: Start Streaming Pipeline
+
+```bash
+# Navigate to: 04_streaming/01_streaming_pipeline_dlt.py
 # This is a Lakeflow Spark Declarative Pipeline - configure in UI:
 - Pipeline Name: matchpulse_streaming_pipeline
 - Target: matchpulse.default
@@ -363,18 +403,18 @@ CREATE SCHEMA IF NOT EXISTS matchpulse.silver;
 databricks pipelines start --pipeline-id <pipeline_id>
 ```
 
-### Step 6: Simulate Live Events
+### Step 7: Simulate Live Events
 
 ```python
-# Run: 03_streaming_simulator/streaming_event_generator.py
+# Run: 04_streaming/00_streaming_simulator.py
 # Writes events to S3 in batches (simulates live match)
 # Auto Loader picks up new files within ~5 seconds
 ```
 
-### Step 7: Analyze Results
+### Step 8: Analyze Results
 
 ```bash
-# Run: 06_analysis/wc_final_pitch_analysis.ipynb
+# Run: 06_analysis/01_wc_final_pitch_analysis.ipynb
 # Generates:
 - Messi heatmap (239 touch events)
 - Argentina pass network (92 connections, 12 key players)
