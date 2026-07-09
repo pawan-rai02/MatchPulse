@@ -178,6 +178,10 @@ $RECYCLE_BIN/
 # Project Specific
 # =============================================================================
 
+# Keep only the production DLT pipeline from the streaming module
+04_streaming/*
+!04_streaming/02_streaming_pipeline_dlt.py
+
 # Local development
 local_tests/
 scratch/
